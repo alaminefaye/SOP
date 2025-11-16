@@ -2,6 +2,10 @@
 
 @section('title', $procedure->title . ' - SOP')
 
+@php
+    use Illuminate\Support\Facades\Storage;
+@endphp
+
 @section('content')
 <div class="row">
     <div class="col-12">
@@ -58,6 +62,40 @@
                         {!! nl2br(e($procedure->content)) !!}
                     </div>
                 </div>
+
+                @if($procedure->attachments->count() > 0)
+                    <div class="mb-4">
+                        <h6>Fichiers joints (Photos, Vidéos, Documents)</h6>
+                        <div class="row g-3">
+                            @foreach($procedure->attachments as $attachment)
+                                <div class="col-md-4">
+                                    <div class="card">
+                                        @if(in_array($attachment->file_type, ['image']))
+                                            <img src="{{ Storage::url($attachment->file_path) }}" class="card-img-top" alt="{{ $attachment->file_name }}" style="max-height: 200px; object-fit: cover;">
+                                        @elseif(in_array($attachment->file_type, ['video']))
+                                            <div class="card-body text-center bg-light">
+                                                <i class="bx bx-video fs-1 text-primary"></i>
+                                                <p class="mb-0 mt-2">{{ $attachment->file_name }}</p>
+                                            </div>
+                                        @else
+                                            <div class="card-body text-center bg-light">
+                                                <i class="bx bx-file fs-1 text-secondary"></i>
+                                                <p class="mb-0 mt-2">{{ $attachment->file_name }}</p>
+                                                <small class="text-muted">{{ number_format($attachment->file_size / 1024, 2) }} KB</small>
+                                            </div>
+                                        @endif
+                                        <div class="card-footer">
+                                            <a href="{{ Storage::url($attachment->file_path) }}" target="_blank" class="btn btn-sm btn-primary w-100">
+                                                <i class="bx bx-show me-1"></i>
+                                                Voir
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
 
                 @if($procedure->checklists->count() > 0)
                     <div class="mb-4">
